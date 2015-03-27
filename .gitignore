@@ -1,0 +1,12 @@
+data/*
+*~
+.ipynb_checkpoints/*
+ipython_log.py
+*.pyc
+output/*
+*.mat
+.Rproj.user
+*/.RData
+*/.Rhistory
+*.pdf
+*.Rproj
