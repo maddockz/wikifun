@@ -1,6 +1,6 @@
 # README #
 
-I haven't written anything yet, but my python code is going into the 'wikifun' folder.
+I haven't written anything yet.
 
 ### What is this repository for? ###
 
