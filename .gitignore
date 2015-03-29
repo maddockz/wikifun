@@ -10,3 +10,6 @@ output/*
 */.Rhistory
 *.pdf
 *.Rproj
+.project
+.pydevproject
+.metadata/
