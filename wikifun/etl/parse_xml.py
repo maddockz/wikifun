@@ -13,8 +13,9 @@ except ImportError:
     import xml.etree.ElementTree as ET
 
 
-## About 10000 lines of XML from Wikipedia
-xml_file = pkg_resources.resource_filename('wikifun', "../data/sandbox/tenk.xml")
+_wiki_dump = "enwiki-20150304-pages-articles.xml.bz2"
+wiki_dump_filename = pkg_resources.resource_filename('wikifun',
+                                                     "../data/" + _wiki_dump)
 
 def bz2_to_mysql(filename):
     """
@@ -24,23 +25,28 @@ def bz2_to_mysql(filename):
     """
     with BZ2File(filename) as f:
         page = read_page(f)
-        while page:
+        N = 0 ## REMOVE N LATER
+        while page and N < 100:
             text = extract_text(page)
-            title = title_from_text(text)
+            title = extract_title(page)
             cats = categories_from_text(text)
             try:
-                insert_record(title,text,cats)
+                # INSERT only if article text is not empty
+                if text:
+                    print 'TEXT ACCEPTED FROM: {0}'.format(title)
+                    print 'TEXT IS TYPE: {0}'.format(type(text))
+                    insert_record(title,text,cats)
             except:
                 "Error INSERTing article '{0}'".format(title)
             page = read_page(f)
+            N += 1
 
 def read_page(f):
     """
-    Extracts next wikipedia page from BZ2File stream
+    Reads next wikipedia page from BZ2File stream
     :param f: BZ2File
-    :return: str # xml string found between <page> tags
-    E.g. <page> [return-me] </page>
-    Caveat: Returns None if no pages found
+    :return: str # xml string bounded by <page> tags
+    Caveat: Returns '' if no pages found
     """
     lines = []
     page_open = False
@@ -49,28 +55,37 @@ def read_page(f):
         line = f.readline()
         if(re.findall('<page>',line)):
             page_open = True
+            lines.append('<page>')
         if not line:
             break # EOF reached
-    # Store lines until </page> or EOF is encountered
+    # Store lines until after </page> encountered
     while page_open:
         line = f.readline()
         if(re.findall('</page>', line)):
             page_open = False
-        else:
-            lines.append(line)
         if not line:
             print "Warning: EOF reached within <page> environment"
             break
+        lines.append(line)
     return '\n'.join(lines)
 
 
 def extract_text(xml_string):
     """
     Extracts the text from XML page string
-    :type filename: str # a wikipedia XML page
-    :return: str # the raw text of the wikipedia article
+    :type xml_string: str # a single wikipedia XML page
+    :return: unicode # the raw text of the wikipedia article
     """
-    return xml_string
+    root = ET.fromstring(xml_string)
+    raw_text = root.find('./revision/text').text
+    ## Remove meta data before article text
+    match = re.search("\'\'\'", raw_text)
+    if match:
+        clean_text = unicode(raw_text[match.start():])
+    else:
+        clean_text = u''
+    return clean_text
+
 
 def categories_from_text(text):
     """
@@ -83,8 +98,18 @@ def categories_from_text(text):
     # [[Category:<name>| ]] (in case <name> is article title)
     return re.findall('\[\[[Cc]ategory:\s*([^\]\|]*)\s*\|?\s*\]\]', text)
 
+def extract_title(xml_string):
+    """
+    Extracts the title from XML Wikipedia page string
+    :param xml_string: unicode
+    :return: unicode
+    """
+    root = ET.fromstring(xml_string)
+    return unicode(root.find('./title').text)
+
 def title_from_text(text):
     """
+    Deprecated: Instead use extract_title.
     Extracts the title of a Wikipedia article from its raw text
     :param text: str # Wikipedia article raw text
     :return: str # title of article
@@ -104,5 +129,7 @@ def insert_record(title, text, cats):
     :param cats: list[str]
     :return: None
     """
-    print "Title:{0}, Cats:{1}, Text:{2}...".format(title, cats, text[:15])
+    print u"Title:{0}, Cats:{1},\n Text:{2}...".format(title, cats,
+                                                      text[:80].replace('\n',''))
     pass
+
