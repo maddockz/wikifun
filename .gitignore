@@ -13,3 +13,4 @@ output/*
 .project
 .pydevproject
 .metadata/
+.idea/*
