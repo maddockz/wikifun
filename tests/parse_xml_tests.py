@@ -25,9 +25,9 @@ class TestBz2:
     def setUp(self):
         example = ["blah blah blah\n",
                    '<page> \n',
-                   "The title of the article is '''TITLE''', yes?\n",
-                   "hamsters can fly.\n",
-                   "they really can't.\n",
+                   "The title of the article is '''TITLE''', yes indeed!\n",
+                   "Hamsters can fly.\n",
+                   "They really can't.\n",
                    "[[Category:Lies]]\n",
                    "[[Category:Hamsters| ]]\n",
                    "</page>\n",
@@ -46,3 +46,33 @@ class TestBz2:
             page2 = parse_xml.read_page(f)
             title2 = parse_xml.title_from_text(page2)
             assert len(title2) == 0, "Title not empty, Title: {0}".format(title2)
+
+class TestWikiDumpParsing:
+    def setUp(self):
+        self.f = BZ2File(parse_xml.wiki_dump_filename)
+
+    def teardown(self):
+        self.f.close()
+
+    def test_first_title(self):
+        first_page = parse_xml.read_page(self.f)
+        title = parse_xml.extract_title(first_page)
+        assertion =  (title == "AccessibleComputing")
+        assert assertion, 'First title:{0} is not AccessibleComputing'.format(title)
+
+    def test_first_nonempty_article(self):
+        text = ''
+        title = ''
+        while not text:
+            page = parse_xml.read_page(self.f)
+            title = parse_xml.extract_title(page)
+            text = parse_xml.extract_text(page)
+        assert title == "Anarchism", "Title is: {0}".format(title)
+
+    def test_unicode_text(self):
+        for i in range(50):
+            page = parse_xml.read_page(self.f)
+            text = parse_xml.extract_text(page)
+            assert type(text)==unicode, "Text of type: {0}".format(type(text))
+
+
