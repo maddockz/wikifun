@@ -23,7 +23,7 @@ def bz2_to_mysql(filename):
     :return: None
     """
     with BZ2File(filename) as f:
-        page = extract_page(f)
+        page = read_page(f)
         while page:
             text = extract_text(page)
             title = title_from_text(text)
@@ -32,9 +32,9 @@ def bz2_to_mysql(filename):
                 insert_record(title,text,cats)
             except:
                 "Error INSERTing article '{0}'".format(title)
-            page = extract_page(f)
+            page = read_page(f)
 
-def extract_page(f):
+def read_page(f):
     """
     Extracts next wikipedia page from BZ2File stream
     :param f: BZ2File

@@ -8,7 +8,6 @@ import subprocess
 import os.path
 
 def test_extract_text():
-    # Assert that 83 articles are extracted from our sandbox data set
     assert True
 
 def test_title_from_text():
@@ -40,10 +39,10 @@ class TestBz2:
 
     def test_title(self):
         with BZ2File(TestBz2.test_file, 'r') as f:
-            page = parse_xml.extract_page(f)
+            page = parse_xml.read_page(f)
             title = parse_xml.title_from_text(page)
             assert title == "TITLE", "Page 1 title: {0}".format(title)
 
-            page2 = parse_xml.extract_page(f)
+            page2 = parse_xml.read_page(f)
             title2 = parse_xml.title_from_text(page2)
             assert len(title2) == 0, "Title not empty, Title: {0}".format(title2)
