@@ -11,9 +11,9 @@ try:
     import xml.etree.cElementTree as ET
 except ImportError:
     import xml.etree.ElementTree as ET
+import config
 
-
-_wiki_dump = "enwiki-20150304-pages-articles.xml.bz2"
+_wiki_dump = config.wiki_dump
 wiki_dump_filename = pkg_resources.resource_filename('wikifun',
                                                      "../data/" + _wiki_dump)
 
@@ -43,7 +43,7 @@ def bz2_to_mysql(filename):
 
 def read_page(f):
     """
-    Reads next wikipedia page from BZ2File stream
+    Reads next Wikipedia page from BZ2File stream
     :param f: BZ2File
     :return: str # xml string bounded by <page> tags
     Caveat: Returns '' if no pages found
