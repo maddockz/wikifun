@@ -1,11 +1,10 @@
 # README #
 
-I haven't written anything yet.
-
 ### What is this repository for? ###
 
 * The ultimate goal is to practice Naive Bayes classification on Wikipedia 
-  articles by attempting to classify articles as 'History' or 'Sports'.  
+  articles by attempting to classify articles as 'History' or 'Sports' (or
+  neither).  
   
   In the first stage, we clean a dump of a Wikipedia archive and store it in 
   a MySQL database.  Perhaps this will more useful to other users than the
