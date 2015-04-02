@@ -8,4 +8,4 @@ database = {'host':'localhost',
 
 # Name of wikipedia archival dump file
 # This file must be in ./data/ directory
-wiki_dump = "enwiki-20150304-pages-articles.xml.bz2"
+WIKI_DUMP_FILENAME = "enwiki-20150304-pages-articles.xml.bz2"
