@@ -1,18 +1,24 @@
 __author__ = 'maddockz'
 
-from nose.tools import *
-from wikifun.etl import parse_xml
+import os.path
 from bz2 import BZ2File
+
 import pkg_resources
 import subprocess
-import os.path
+from nose.tools import *
+
+from wikifun.etl import parse_xml
+import wikifun.etl.data_models as dm
+
 
 def test_extract_text():
     assert True
 
+
 def test_title_from_text():
     title = parse_xml.title_from_text("heroes are found ' in ' the '''Call of Duty''' ")
     assert title == 'Call of Duty'
+
 
 def test_categories_from_text():
     text = "blah blah [[Boring]], [[Category: Talk]] grapefruit [[Category: Fruit| ]]"
@@ -20,8 +26,10 @@ def test_categories_from_text():
     assert categories[0] == "Talk", "Failure: Category = {0}".format(categories[0])
     assert categories[1] == "Fruit", "Failure: Cateogry = {0}".format(categories[1])
 
+
 class TestBz2:
     test_file = pkg_resources.resource_filename('wikifun', '../data/sandbox/test.bz2')
+
     def setUp(self):
         example = ["blah blah blah\n",
                    '<page> \n',
@@ -47,9 +55,10 @@ class TestBz2:
             title2 = parse_xml.title_from_text(page2)
             assert len(title2) == 0, "Title not empty, Title: {0}".format(title2)
 
+
 class TestWikiDumpParsing:
     def setUp(self):
-        self.f = BZ2File(parse_xml.wiki_dump_filename)
+        self.f = BZ2File(parse_xml._wiki_dump_abspath)
 
     def teardown(self):
         self.f.close()
@@ -57,7 +66,7 @@ class TestWikiDumpParsing:
     def test_first_title(self):
         first_page = parse_xml.read_page(self.f)
         title = parse_xml.extract_title(first_page)
-        assertion =  (title == "AccessibleComputing")
+        assertion = (title == "AccessibleComputing")
         assert assertion, 'First title:{0} is not AccessibleComputing'.format(title)
 
     def test_first_nonempty_article(self):
@@ -73,6 +82,16 @@ class TestWikiDumpParsing:
         for i in range(50):
             page = parse_xml.read_page(self.f)
             text = parse_xml.extract_text(page)
-            assert type(text)==unicode, "Text of type: {0}".format(type(text))
+            assert type(text) == unicode, "Text of type: {0}".format(type(text))
+
+    def test_char_byte_length(self):
+        for i in range(50):
+            page = parse_xml.read_page(self.f)
+            text = parse_xml.extract_text(page)
+            title = parse_xml.extract_title(page)
+            for char in text:
+                msg = u'4 Bytes required: Article {0} contains {1}'.format(title,
+                                                                          char)
+                assert ord(char) < 256**3, msg
 
 
