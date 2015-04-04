@@ -2,6 +2,7 @@ __author__ = 'maddockz'
 
 import os.path
 from bz2 import BZ2File
+import re
 
 import pkg_resources
 import subprocess
@@ -94,4 +95,24 @@ class TestWikiDumpParsing:
                                                                           char)
                 assert ord(char) < 256**3, msg
 
+    def test_disambiguation_category_removal(self):
+        # Tests if first 150 articles are disambiguations
+        def _throw_if_disambig(record):
+            if re.findall(r'\(disambiguation\)', record['title']):
+                raise Exception(record['title'])
 
+        try:
+            parse_xml.bz2_parse(insert_fun = _throw_if_disambig, limit=150)
+        except Exception, e:
+            title = e.args[0]
+            assert False, "Disambiguation found in article '{0}]".format(title)
+
+class TestCleaningAndFiltering:
+    def setUp(self):
+        self.record = {}
+        self.record['title'] = 'Title'
+        self.record['text'] = '"Here [[is]] [[GARBAGE|text.]]{{cite book}}"'
+
+    def test_clean_text(self):
+        record = parse_xml.clean_record(self.record)
+        assert record['text'] == 'Here is text.', record['text']
