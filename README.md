@@ -7,8 +7,7 @@
   neither).  
   
   In the first stage, we clean a dump of a Wikipedia archive and store it in 
-  a MySQL database.  Perhaps this will more useful to other users than the
-  analysis that follows. 
+  a MySQL database.
 
 * Version 1.0
 
@@ -22,7 +21,8 @@
  
     2) Set up a MySQL server to host the upload of the parsed archive.
 
-    3) Modify the configuration file ./config.py
+    3) Modify ./config.py, adding the .xml.bz2 filename, and the
+       MySQL database configurations.
     
 
 * Dependencies: numpy, nose, bz2
