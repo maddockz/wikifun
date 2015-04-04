@@ -9,7 +9,7 @@ and extracts the categories the article belongs to.  These are then
 uploaded into the MySQL database (cf. config.py)
 
 E.g. To parse the first N articles, use the function:
-                bz2_to_bz2_to_mysql(limit=N)
+                bz2_to_mysql(limit=N)
 Passing no argument parses all articles, and may take a day or two.
 
 This function is called when running module from the command line:

@@ -8,7 +8,7 @@ import pkg_resources
 import subprocess
 from nose.tools import *
 
-from wikifun.etl import parse_xml
+from wikifun.etl import parse
 import wikifun.etl.data_models as dm
 
 
@@ -17,13 +17,13 @@ def test_extract_text():
 
 
 def test_title_from_text():
-    title = parse_xml.title_from_text("heroes are found ' in ' the '''Call of Duty''' ")
+    title = parse.title_from_text("heroes are found ' in ' the '''Call of Duty''' ")
     assert title == 'Call of Duty'
 
 
 def test_categories_from_text():
     text = "blah blah [[Boring]], [[Category: Talk]] grapefruit [[Category: Fruit| ]]"
-    categories = parse_xml.categories_from_text(text)
+    categories = parse.categories_from_text(text)
     assert categories[0] == "Talk", "Failure: Category = {0}".format(categories[0])
     assert categories[1] == "Fruit", "Failure: Cateogry = {0}".format(categories[1])
 
@@ -48,25 +48,25 @@ class TestBz2:
 
     def test_title(self):
         with BZ2File(TestBz2.test_file, 'r') as f:
-            page = parse_xml.read_page(f)
-            title = parse_xml.title_from_text(page)
+            page = parse.read_page(f)
+            title = parse.title_from_text(page)
             assert title == "TITLE", "Page 1 title: {0}".format(title)
 
-            page2 = parse_xml.read_page(f)
-            title2 = parse_xml.title_from_text(page2)
+            page2 = parse.read_page(f)
+            title2 = parse.title_from_text(page2)
             assert len(title2) == 0, "Title not empty, Title: {0}".format(title2)
 
 
 class TestWikiDumpParsing:
     def setUp(self):
-        self.f = BZ2File(parse_xml._wiki_dump_abspath)
+        self.f = BZ2File(parse._wiki_dump_abspath)
 
     def teardown(self):
         self.f.close()
 
     def test_first_title(self):
-        first_page = parse_xml.read_page(self.f)
-        title = parse_xml.extract_title(first_page)
+        first_page = parse.read_page(self.f)
+        title = parse.extract_title(first_page)
         assertion = (title == "AccessibleComputing")
         assert assertion, 'First title:{0} is not AccessibleComputing'.format(title)
 
@@ -74,22 +74,22 @@ class TestWikiDumpParsing:
         text = ''
         title = ''
         while not text:
-            page = parse_xml.read_page(self.f)
-            title = parse_xml.extract_title(page)
-            text = parse_xml.extract_text(page)
+            page = parse.read_page(self.f)
+            title = parse.extract_title(page)
+            text = parse.extract_text(page)
         assert title == "Anarchism", "Title is: {0}".format(title)
 
     def test_unicode_text(self):
         for i in range(50):
-            page = parse_xml.read_page(self.f)
-            text = parse_xml.extract_text(page)
+            page = parse.read_page(self.f)
+            text = parse.extract_text(page)
             assert type(text) == unicode, "Text of type: {0}".format(type(text))
 
     def test_char_byte_length(self):
         for i in range(50):
-            page = parse_xml.read_page(self.f)
-            text = parse_xml.extract_text(page)
-            title = parse_xml.extract_title(page)
+            page = parse.read_page(self.f)
+            text = parse.extract_text(page)
+            title = parse.extract_title(page)
             for char in text:
                 msg = u'4 Bytes required: Article {0} contains {1}'.format(title,
                                                                           char)
@@ -102,7 +102,7 @@ class TestWikiDumpParsing:
                 raise Exception(record['title'])
 
         try:
-            parse_xml.bz2_parse(insert_fun = _throw_if_disambig, limit=150)
+            parse.bz2_parse(insert_fun = _throw_if_disambig, limit=150)
         except Exception, e:
             title = e.args[0]
             assert False, "Disambiguation found in article '{0}]".format(title)
@@ -114,5 +114,5 @@ class TestCleaningAndFiltering:
         self.record['text'] = '"Here [[is]] [[GARBAGE|text.]]{{cite book}}"'
 
     def test_clean_text(self):
-        record = parse_xml.clean_record(self.record)
+        record = parse.clean_record(self.record)
         assert record['text'] == 'Here is text.', record['text']
