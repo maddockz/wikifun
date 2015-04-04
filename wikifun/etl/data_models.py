@@ -23,7 +23,7 @@ class BaseModel(pw.Model):
 
 
 class Article(BaseModel):
-    title = pw.CharField(unique=True, null=False)
+    title = pw.CharField(null=False)
     text = pw.TextField()
     is_history = pw.BooleanField(null=True)
     is_sports = pw.BooleanField(null=True)
