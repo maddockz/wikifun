@@ -1,4 +1,9 @@
+"""
+Tests for integrity of data models.
+"""
 __author__ = 'maddockz'
+
+import re
 
 import wikifun.etl.data_models as dm
 
@@ -22,4 +27,14 @@ class TestDatabaseConnection:
             assert False, e
         else:
             assert True
+
+    def test_disambiguation_category_removal(self):
+        # Tests if first 150 articles are disambiguations
+        try:
+            a = dm.Article.select().where(dm.Article.title % '%disambiguation%')
+        except dm.Article.DoesNotExist:
+            assert True
+        else:
+            first = a.get()
+            assert False, "Disambiguation exists: {0}".format(first.title)
 
