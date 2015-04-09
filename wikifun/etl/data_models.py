@@ -25,6 +25,7 @@ class BaseModel(pw.Model):
 class Article(BaseModel):
     title = pw.CharField(null=False)
     text = pw.TextField()
+    length = pw.IntegerField(null=True)
     is_history = pw.BooleanField(null=True)
     is_sports = pw.BooleanField(null=True)
 
@@ -37,6 +38,18 @@ class MappingTable(BaseModel):
     article = pw.ForeignKeyField(Article)
     category = pw.ForeignKeyField(Category)
 
+class Word(BaseModel):
+    value = pw.CharField(null=False)
+#    idf = pw.FloatField(null=True)
+
+
+class WordFreq(BaseModel):
+    article = pw.ForeignKeyField(Article)
+    word = pw.ForeignKeyField(Word)
+    freq = pw.IntegerField(null=False)
+ #   max_freq = pw.IntegerField(null=True)
+
+
 
 def create_tables():
     """
@@ -44,7 +57,7 @@ def create_tables():
     :return: None
     """
     db.connect()
-    for model in [Article, Category, MappingTable]:
+    for model in [Article, Category, MappingTable, Word, WordFreq]:
         try:
             model.create_table()
         except pw.OperationalError, err:
@@ -58,7 +71,7 @@ def drop_tables():
     :return: None
     """
     db.connect()
-    db.drop_tables([Article, Category, MappingTable])
+    db.drop_tables([Article, Category, MappingTable, Word, WordFreq])
     db.close()
 
 def make_tables_unicode():
