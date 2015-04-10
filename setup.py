@@ -14,4 +14,4 @@ config = {
           'scripts': [],
           'name': 'wikifun'} 
 
-setup(**config)
+setup(**config, requires=['peewee'])
