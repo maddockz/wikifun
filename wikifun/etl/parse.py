@@ -19,6 +19,7 @@ python ./wikifun/etl/parse_xml.py [N]
 import re
 import sys
 from bz2 import BZ2File
+
 try:
     import xml.etree.cElementTree as et
 except ImportError:
@@ -33,6 +34,7 @@ import config
 _wiki_dump = config.WIKI_DUMP_FILENAME
 _wiki_dump_abspath = pkg_resources.resource_filename('wikifun',
                                                      "../data/" + _wiki_dump)
+
 
 def insert_record(record):
     """
@@ -58,11 +60,11 @@ def insert_record(record):
             try:
                 category = dm.Category(value=cat_value)
                 category.save()
-            except pw.IntegrityError, e:  # If duplicate category
+            except pw.IntegrityError:  # If duplicate category
                 # Select the category entry already in the table
                 category = dm.Category.get(dm.Category.value == cat_value)
             try:
-                mapping_table = dm.MappingTable(article=article,category=category)
+                mapping_table = dm.MappingTable(article=article, category=category)
                 mapping_table.save()
             except pw.IntegrityError, e:
                 print e
@@ -70,6 +72,7 @@ def insert_record(record):
         dm.db.close()
     if bad_record:
         return record
+
 
 def filter_record(record):
     """
@@ -89,6 +92,7 @@ def filter_record(record):
         return False
     return True
 
+
 def clean_record(record):
     """
     Cleans the wikipedia page text found in record['text'] of formatting
@@ -98,37 +102,37 @@ def clean_record(record):
     :return: dict :key text: unicode
     """
     text = record['text']
-    # Replace [[<link>|<text>]] with <text>
-    text = re.sub(r'\[\[([^\]]{0,255})\|([^\]]{0,255})\]\]',
-                  lambda x: x.group(2),
-                  text)
+
+    # Remove the end of the articles, including external links,
+    # references, and especially the list of cateogories
+    match = re.search(r'(=+\s*External links|=+\s*References|\[\[Category:)',
+                      text,
+                      re.IGNORECASE)
+    text = text[:match.start()]
+
     # Remove {{cite| ... }} and {{IPA...}}
     removal_regexp = r'{{[Cc](ite|itation) [^}]+}}'
     removal_regexp += r'|{{IPA[^}{]{0,255}}}'
     text = re.sub(removal_regexp, '', text, flags=re.DOTALL)
+
     # Removes <ref ...> ... </ref>
     text = re.sub(r'<ref[^>]*(/>|>[^<]*</ref>)',
                   '',
                   text,
                   flags=re.DOTALL)
-    # Replace [[<link name>]] with <link name>
-    text = re.sub(r'\[\[([^\]]{0,255})\]\]',
-                  lambda x: x.group(1),
-                  text,
-                  flags=re.DOTALL)
-    # Replace &nbsp; with ' '
+
+    # Replacements
     text = re.sub(r'&nbsp;', ' ', text)
-    # Replace &ndash; with ' - '
     text = re.sub(r'&ndash;', ' - ', text)
     # Replace {{lang.##|<text>}} with <text>
     text = re.sub(r'{{lang.{3}\|([^}\|]{0,255})}}',
-                  lambda x: x.group(1), text )
+                  lambda x: x.group(1), text)
     # Remove comments <!--- --->
     text = re.sub(r'<![^>]+>', '', text)
     # Remove formatting strings: style="...", class="..."
     text = re.sub(r'(style|class)\s?="[^"]{0,50}"', '', text)
     # Remove small tags <...>
-    text = re.sub(r'<.{0,30}>','', text)
+    text = re.sub(r'<.{0,30}>', '', text)
 
     record['text'] = text
     return record
@@ -163,7 +167,8 @@ def bz2_parse(filename=_wiki_dump_abspath, insert_fun=insert_record, limit=1e12)
             n += 1
     return bad_records
 
-def bz2_to_mysql(filename = _wiki_dump_abspath, limit=1e12):
+
+def bz2_to_mysql(filename=_wiki_dump_abspath, limit=1e12):
     """
     Parses a .xml.bz2 file containing wikipedia articles and stores in MySQL
     :param filename: str  # path to .xml.bz2 file
@@ -213,7 +218,7 @@ def extract_text(xml_string):
     # Remove meta data before article text
     try:
         match = re.search(r"^[^{}\|\n].{0,50}'''", raw_text, flags=re.MULTILINE)
-    except TypeError, e:
+    except TypeError:
         print "Text is empty."
         match = None
     if match:
