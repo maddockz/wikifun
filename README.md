@@ -25,7 +25,7 @@
        MySQL database configurations.
     
 
-* Dependencies: numpy, nose, bz2
+* Dependencies: numpy, nose, bz2, peewee
 
 * Database configuration in ./config.py
     * Must be MySQL
