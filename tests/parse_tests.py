@@ -95,23 +95,13 @@ class TestWikiDumpParsing:
                                                                           char)
                 assert ord(char) < 256**3, msg
 
-    def test_disambiguation_category_removal(self):
-        # Tests if first 150 articles are disambiguations
-        def _throw_if_disambig(record):
-            if re.findall(r'\(disambiguation\)', record['title']):
-                raise Exception(record['title'])
-
-        try:
-            parse.bz2_parse(insert_fun = _throw_if_disambig, limit=150)
-        except Exception, e:
-            title = e.args[0]
-            assert False, "Disambiguation found in article '{0}]".format(title)
 
 class TestCleaningAndFiltering:
     def setUp(self):
         self.record = {}
         self.record['title'] = 'Title'
-        self.record['text'] = '"Here [[is]] [[GARBAGE|text.]]{{cite book}}"'
+        text = 'Here is text.{{cite book}}[[Category:A]] XXX'
+        self.record['text'] = text
 
     def test_clean_text(self):
         record = parse.clean_record(self.record)
