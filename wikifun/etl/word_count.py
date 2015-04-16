@@ -40,14 +40,11 @@ def record(article, word, freq):
         dm.db.connect()
         if not word:
             raise TypeError, "word string is empty or None"
-        w = None
-        for this_word in dm.Word.select().where(dm.Word.value==word).iterator():
-            if this_word.value == word:  #Needed b/c MySQL thinks 'e' = 'é'
-                w = this_word
-        if not w:
+        try:
+            w = dm.Word.get(dm.Word.value==word)
+        except pw.DoesNotExist:
             w = dm.Word(value=word)
             w.save()
-
         word_freq = dm.WordFreq(word=w, article=article,freq=freq)
         word_freq.save()
     except TypeError:
