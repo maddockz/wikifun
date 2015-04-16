@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Implements a naive (idiot's) Bayes model (with multinomial likelihood)
 under a 'bag-of-words' assumption for (Wikipedia) articles.  This is a
