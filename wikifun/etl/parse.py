@@ -63,10 +63,15 @@ def insert_record(record):
             except pw.IntegrityError:  # If duplicate category
                 # Select the category entry already in the table
                 category = dm.Category.get(dm.Category.value == cat_value)
+            except pw.DataError, e:  # If data too long for category
+                print "Category overflow: {0}...".format(category.value[:20]),
+                print e
             try:
                 mapping_table = dm.MappingTable(article=article, category=category)
                 mapping_table.save()
             except pw.IntegrityError, e:
+                print e
+            except pw.OperationalError, e:
                 print e
     finally:
         dm.db.close()
@@ -79,10 +84,10 @@ def filter_record(record):
     Returns true if the record is dict containing valid
     (non-disambiguation, non-redirect) wikipedia page.
     :param record: dict
-    :key title: unicode
-    :key text: unicode
-    :key cats: list[unicode]
-    :return: True
+        :key title: unicode
+        :key text: unicode
+        :key cats: list[unicode]
+    :return: bool
     """
     if re.findall(r'\(disambiguation\)', record['title']):
         return False
@@ -97,9 +102,8 @@ def clean_record(record):
     """
     Cleans the wikipedia page text found in record['text'] of formatting
     characters, references, etc.  Side-effect: modifies record.
-    :param record: dict
-    :key text: unicode
-    :return: dict :key text: unicode
+    :param record: dict of [str, unicode]
+    :return: dict of [str, unicode]
     """
     text = record['text']
 
@@ -108,7 +112,8 @@ def clean_record(record):
     match = re.search(r'(=+\s*External links|=+\s*References|\[\[Category:)',
                       text,
                       re.IGNORECASE)
-    text = text[:match.start()]
+    if match:
+        text = text[:match.start()]
 
     # Remove {{cite| ... }} and {{IPA...}}
     removal_regexp = r'{{[Cc](ite|itation) [^}]+}}'
@@ -165,6 +170,9 @@ def bz2_parse(filename=_wiki_dump_abspath, insert_fun=insert_record, limit=1e12)
                     bad_records.append(bad_record)
             page = read_page(f)
             n += 1
+            print n,
+            if n % 20 == 0:
+                print '\n',
     return bad_records
 
 
