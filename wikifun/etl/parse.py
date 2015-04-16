@@ -281,5 +281,5 @@ def title_from_text(text):
 if __name__ == '__main__':
     n = 1e12
     if len(sys.argv) > 1:
-        n = sys.argv[1]
+        n = int(sys.argv[1])
     bz2_to_mysql(limit=n)
