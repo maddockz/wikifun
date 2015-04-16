@@ -7,10 +7,10 @@ import peewee as pw
 import MySQLdb as msdb
 import config
 
-__config = {key: config.database[key] for key in filter(lambda x: x is not 'db',
+_config = {key: config.database[key] for key in filter(lambda x: x is not 'db',
                                                         config.database.keys())}
 try:
-    db = pw.MySQLDatabase(config.database['db'], **__config)
+    db = pw.MySQLDatabase(config.database['db'], **_config)
 except Exception:
     print "{0} cannot connect to {1}".format(config.database['user'],
                                              config.database['host'])
@@ -39,7 +39,7 @@ class MappingTable(BaseModel):
     category = pw.ForeignKeyField(Category)
 
 class Word(BaseModel):
-    value = pw.CharField(null=False)
+    value = pw.CharField(unique=True, null=False)
 #    idf = pw.FloatField(null=True)
 
 
@@ -53,7 +53,7 @@ class WordFreq(BaseModel):
 
 def create_tables():
     """
-    Creates tables articles, categories, and mappingtable if do not exist
+    Creates tables if do not exist
     :return: None
     """
     db.connect()
@@ -64,6 +64,20 @@ def create_tables():
             "Table {0} already exists".format(str(model))
 
     db.close()
+
+def create_database():
+    """
+    Creates the MySQL database 'wikifun'.  Throws msdb.ProgrammingError
+    if database already exists.
+    :return:
+    """
+    con = msdb.connect(**_config)
+    cursor = con.cursor()
+    sql = "CREATE DATABASE " + config.database['db']
+    sql += " CHARSET = utf8 COLLATE = utf8_bin"
+    cursor.execute(sql)
+    con.close()
+
 
 def drop_tables():
     """
