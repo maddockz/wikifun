@@ -20,7 +20,7 @@ if __name__=='__main__':
         limit = 1e9
         print "No Limit"
     else:
-        limit = sys.argv[1]
+        limit = int(sys.argv[1])
         print "Limit = {0}".format(limit)
 
     dm.create_database()
