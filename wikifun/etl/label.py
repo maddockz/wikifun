@@ -8,14 +8,19 @@ import MySQLdb as msdb
 
 import config
 
-db = msdb.connect(**config.database)
-c = db.cursor()
-c.execute("""UPDATE article
-             SET is_history = TRUE
-             WHERE id IN (
-               SELECT article_id FROM mappingtable
-               INNER JOIN category ON category_id = category.id
-               WHERE value LIKE '%history%')""")
-db.commit()
-db.close()
+def label_history():
+    """
+    Sets the is_history label to True where category LIKE '%history%'.
+    :return: None
+    """
+    db = msdb.connect(**config.database)
+    c = db.cursor()
+    c.execute("""UPDATE article
+              SET is_history = TRUE
+              WHERE id IN (
+              SELECT article_id FROM mappingtable
+              INNER JOIN category ON category_id = category.id
+              WHERE value LIKE '%history%')""")
+    db.commit()
+    db.close()
 
