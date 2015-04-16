@@ -74,7 +74,7 @@ def create_database():
     con = msdb.connect(**_config)
     cursor = con.cursor()
     sql = "CREATE DATABASE " + config.database['db']
-    sql += " CHARSET = utf8 COLLATE = utf8_bin"
+    sql += " CHARSET = utf8mb4 COLLATE = utf8mb4_bin"
     cursor.execute(sql)
     con.close()
 
