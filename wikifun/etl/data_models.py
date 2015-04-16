@@ -62,19 +62,20 @@ def create_tables():
             model.create_table()
         except pw.OperationalError, err:
             "Table {0} already exists".format(str(model))
-
     db.close()
 
 def create_database():
     """
     Creates the MySQL database 'wikifun'.  Throws msdb.ProgrammingError
     if database already exists.
+    Warning: MySQL charset utf8mb4 will not allow adding unique index to
+    peewee's CharField.
     :return:
     """
     con = msdb.connect(**_config)
     cursor = con.cursor()
     sql = "CREATE DATABASE " + config.database['db']
-    sql += " CHARSET = utf8mb4 COLLATE = utf8mb4_bin"
+    sql += " CHARSET = utf8 COLLATE = utf8_bin"
     cursor.execute(sql)
     con.close()
 
