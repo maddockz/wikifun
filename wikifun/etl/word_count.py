@@ -42,7 +42,7 @@ def record(article, word, freq):
             raise TypeError, "word string is empty or None"
         w = None
         for this_word in dm.Word.select().where(dm.Word.value==word).iterator():
-            if this_word.value == word:  #e.g. MySQL thinks 'e' = 'é'
+            if this_word.value == word:  #Needed b/c MySQL thinks 'e' = 'é'
                 w = this_word
         if not w:
             w = dm.Word(value=word)
@@ -75,6 +75,8 @@ def tabulate_articles(start=0, stop=10):
         for word, freq in word_freqs.iteritems():
             record(article, word, freq)
         print i,
+        if i % 20 == 0:
+            print '\n',
 
 def compute_idf():
     """
