@@ -15,7 +15,7 @@ Features:
 Parameters:
 * p = a vector of word probabilities.
 
-Full Bayesian assumptions: (we will implement this model in another module)
+Full Bayesian assumptions: (will implement in another module)
 * The likelihood F|L,p ~ Multi(L,p)
 * The entries of the parameter p are iid with Unif(0,1) prior distribution
 * An uninformative prior C ~ Bernoulli(1/2)
@@ -72,7 +72,7 @@ def make_X(articles):
     words = [word for word in dm.Word.select()]
     print len(words)
     n_words = len(words)
-    X = np.ndarray(shape=(len(articles), n_words), dtype=int)
+    X = np.ndarray(shape=(0, n_words), dtype=int)
     for article in articles:
         print article.title
         row = np.ndarray(shape=(1,n_words), dtype=int)
