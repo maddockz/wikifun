@@ -5,6 +5,8 @@ __author__ = 'maddockz'
 
 import re
 
+import peewee as pw
+
 import wikifun.etl.data_models as dm
 
 class TestDatabaseConnection:
@@ -31,10 +33,9 @@ class TestDatabaseConnection:
     def test_disambiguation_category_removal(self):
         # Tests if first 150 articles are disambiguations
         try:
-            a = dm.Article.select().where(dm.Article.title % '%disambiguation%')
-        except dm.Article.DoesNotExist:
+            a = dm.Article.get(dm.Article.title % '%disambiguation%')
+        except pw.DoesNotExist:
             assert True
         else:
-            first = a.get()
-            assert False, "Disambiguation exists: {0}".format(first.title)
+            assert False, "Disambiguation exists: {0}".format(a.title)
 
