@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Labels the articles in the database that have the keyword 'history' in one
 of their categories"""
@@ -24,3 +24,5 @@ def label_history():
     db.commit()
     db.close()
 
+if __name__ == '__main__':
+    label_history()
