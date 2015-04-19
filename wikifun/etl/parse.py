@@ -40,9 +40,9 @@ def insert_record(record):
     """
     INSERT record into MySQL database
     :param record: dict
-    :key title: unicode
-    :key text: unicode
-    :key cats: list[unicode]
+        :key title: unicode
+        :key text: unicode
+        :key cats: list[unicode]
     :return: dict or None # dict is only returned if error with INSERT article
     """
     dm.db.connect()
@@ -55,6 +55,10 @@ def insert_record(record):
     except pw.OperationalError, e:
         print u'Error with article {0}'.format(record['title'])
         bad_record = True
+    except pw.DataError, e:
+        print u'Error with article {0}'.format(record['title'])
+        bad_record = True
+        print e
     else:
         for cat_value in record['cats']:
             try:
@@ -278,8 +282,12 @@ def title_from_text(text):
         return ''
 
 
-if __name__ == '__main__':
+def main():
     n = 1e12
     if len(sys.argv) > 1:
         n = int(sys.argv[1])
     bz2_to_mysql(limit=n)
+
+
+if __name__ == '__main__':
+    main()
