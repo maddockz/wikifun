@@ -43,11 +43,19 @@ class Word(BaseModel):
 #    idf = pw.FloatField(null=True)
 
 
-class WordFreq(BaseModel):
+class WordFreq(pw.Model):
+    # In peewee 2.5.1, there is a rather obnoxious inconsistency when using
+    # CompositeKeys comprising multiple foreign keys:
+    #     In particular, it changes the way one references foreign fields.
+    #     Reference is now by id and not by object.
+    # E.g. type(WordFreq.article) == int and != Article
     article = pw.ForeignKeyField(Article)
     word = pw.ForeignKeyField(Word)
     freq = pw.IntegerField(null=False)
  #   max_freq = pw.IntegerField(null=True)
+    class Meta:
+        database = db
+        primary_key = pw.CompositeKey('article','word')
 
 
 
