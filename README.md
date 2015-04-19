@@ -23,28 +23,30 @@
        ./data directory as a .xml.bz2 file.
        (cf. http://en.wikipedia.org/wiki/Wikipedia:Database_download)
  
-    2) Set up a MySQL server to host the upload of the parsed archive.  Make 
-       sure to give the user in ./config.py full permissions to the database.
+    2) Start a MySQL server to host the wikifun data.  
+       Log in as root and execute:
+         mysql> GRANT ALL ON wikifun.* TO 'usr_wikifun'@'<hostname>';
 
     3) Modify ./config.py, adding the .xml.bz2 filename, and the
-       MySQL database configurations.
+       MySQL database configurations.  
     
-    4) Replacing <max> with an integer number of articles to import into 
-       MySQL, execute  
+    4) Execute  
          >$ python -m wikifun.etl <max>
-       to create the database and compute the features (word frequencies) of 
-       training and testing datasets (10,000 samples each).  
+       <max> is an optional argument that is an integer limiting number of 
+       articles to load into MySQL.  This command creates a MySQL database, 
+       loads up to <max> articles.  Then 2 simple random samples of 10k 
+       articles are chosen for the test and training sets, and the 
+       features (word frequencies) are computed.
        
-       (On my device, this takes roughly 15 hours to extract all articles 
-       into MySQL database.  Takes an additional 4 hours to compute 
-       all word frequencies on the 20,000 articles.)  
+       (Warning: On my device, it takes roughly 15 hours to load all 
+       articles into MySQL database.  Takes an additional 4 hours to compute 
+       the word frequency features on the training and test data sets.)   
     
-    5) Finally, to fit the naive bayes model and see a ROC curve, import the 
-       module wikifun.validation.idiots_bayes_plots and call the roc_curve() 
-       function. 
-       
+    5) To fit the naive bayes model and generate a ROC curve plot, execute
+         >$ python -m wikifun.validate.idiots_bayes_plots
 
-* Dependencies: numpy, nose, bz2, peewee, MySQLdb
+* Dependencies: numpy, nose, bz2, peewee, MySQLdb, sklearn, matplotlib
+                
 
 * Database configuration in ./config.py
     * Uses MySQL database
