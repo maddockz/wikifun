@@ -31,7 +31,7 @@ class TestDatabaseConnection:
             assert True
 
     def test_disambiguation_category_removal(self):
-        # Tests if first 150 articles are disambiguations
+        # Tests if any articles are disambiguations
         try:
             a = dm.Article.get(dm.Article.title % '%disambiguation%')
         except pw.DoesNotExist:
@@ -39,3 +39,11 @@ class TestDatabaseConnection:
         else:
             assert False, "Disambiguation exists: {0}".format(a.title)
 
+    def test_administrative_article_removal(selfs):
+        # Tests if any articles are of form 'Wikipedia:...'
+        try:
+            a = dm.Article.get(dm.Article.title % 'Wikipedia:%')
+        except pw.DoesNotExist:
+            assert True
+        else
+            assert False, "Admin article: {0}".format(a.title)
