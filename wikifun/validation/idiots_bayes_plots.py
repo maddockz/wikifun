@@ -16,7 +16,7 @@ def roc_curve():
     test = sample.get_articles(test_ids)
     X = ib.make_X(test)
     y = ib.make_y(test)
-    roc.plot_all([("train", y, nb_fit.predict_log_proba(X) )])
+    roc.plot_all([("test", y, nb_fit.predict_log_proba(X) )])
 
 
 if __name__ == '__main__':
