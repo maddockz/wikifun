@@ -86,7 +86,7 @@ def insert_record(record):
 def filter_record(record):
     """
     Returns true if the record is dict containing valid
-    (non-disambiguation, non-redirect) wikipedia page.
+    (non-disambiguation, non-redirect, non-administrative) wikipedia page.
     :param record: dict
         :key title: unicode
         :key text: unicode
@@ -94,6 +94,8 @@ def filter_record(record):
     :return: bool
     """
     if re.findall(r'\(disambiguation\)', record['title']):
+        return False
+    if re.findall(r'^Wikipedia:', record['title']):
         return False
     if not record['text']:
         return False
@@ -112,7 +114,7 @@ def clean_record(record):
     text = record['text']
 
     # Remove the end of the articles, including external links,
-    # references, and especially the list of cateogories
+    # references, and especially the list of categories
     match = re.search(r'(=+\s*External links|=+\s*References|\[\[Category:)',
                       text,
                       re.IGNORECASE)
