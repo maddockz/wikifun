@@ -8,8 +8,11 @@ __author__ = 'maddockz'
 import sklearn.metrics as metrics
 import numpy as np
 import matplotlib.pyplot as plt
+import pkg_resources as pkgr
 
-def plot_all(pred_tuple):
+_plots_path = pkgr.resource_filename('wikifun', '../plots/')
+
+def plot_all(pred_tuple, filename='roc.png'):
     """
     Plot ROC curves for all pred_tuples (maximum 5).
     :param pred_tuple: list [tuple] of form (label, y, proba)
@@ -30,4 +33,5 @@ def plot_all(pred_tuple):
     plt.legend(loc="lower right")
 
     plt.show()
+    plt.savefig(_plots_path + filename)
 
