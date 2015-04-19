@@ -44,6 +44,8 @@ from sklearn.svm.libsvm import fit
 __author__ = 'maddockz'
 
 import random
+import sys
+
 from sklearn import naive_bayes as nb
 import numpy as np
 from scipy import sparse
@@ -61,8 +63,8 @@ def make_X(articles):
     """
     n_words = np.sum(1 for _ in dm.Word.select() )
     X = sparse.lil_matrix((0, n_words), dtype=int)
-    for article in articles:
-        print u'Extracting article: {0}'.format(article.title)
+    for idx, article in enumerate(articles):
+        print u'Loading article {1}: {0}'.format(article.title, idx)
         row = np.ndarray((1,n_words), dtype=int)
         row.fill(0)
         # Iterate over all words in article
@@ -97,16 +99,21 @@ def fit_model(X, y):
     print 'Model fit!'
     return nbm
 
-def main():
+def main(limit=int(1e9)):
     """
     Returns naive bayes model fit on cached (pickled) training data
+    :param limit: int  # maximum number of training samples used
     :return: nb.MultinomialNB
     """
     train_ids, test_ids = sample.get_cached_ids()
-    train = sample.get_articles(train_ids)
+    train = sample.get_articles(train_ids[:limit])
     X, y = make_X(train), make_y(train)
     return fit_model(X, y)
 
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) > 1:
+        limit = int(sys.argv[1])
+    else:
+        limit = int(1e9)
+    main(limit)
