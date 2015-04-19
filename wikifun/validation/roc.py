@@ -11,13 +11,13 @@ import matplotlib.pyplot as plt
 
 def plot_all(pred_tuple):
     """
-    Plot ROC curves for all pred_tuples
-    :param pred_pairs: list [tuple] of form (label, y, proba)
+    Plot ROC curves for all pred_tuples (maximum 5).
+    :param pred_tuple: list [tuple] of form (label, y, proba)
     :return:
     """
     plt.clf()
     colors = ["red","blue","green","orange","yellow"]
-    for (label, y, proba), color in zip(pred_pairs, colors):
+    for (label, y, proba), color in zip(pred_tuple, colors):
         true_pos, false_pos, thresh = metrics.roc_curve(y, proba)
         plt.plot(false_pos, true_pos, label=label, linewidth=2,
                  color=color)
