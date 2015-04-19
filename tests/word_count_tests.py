@@ -25,11 +25,9 @@ class TestWordCounts:
         assert freqs['absurdity'] == 1
         assert None not in freqs.keys()
 
-    def test_tabulate_articles(self):
+    def test_anarchy_database_count(self):
         # Test that 'Anarchy' article stored in database
-        # contains 'absurdity' exactly once, but this time stored in the
-        # database.
-        wc.tabulate_articles(start=0,stop=1)  # Tabulate 'Anarchy' article
+        # has frequency stored for 'absurdity' equal to 1.
         absurd = dm.Word.get(dm.Word.value == "absurdity")
         wf = dm.WordFreq.get(dm.WordFreq.article == self.anarchy,
                              dm.WordFreq.word == absurd)
