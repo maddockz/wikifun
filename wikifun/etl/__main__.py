@@ -13,7 +13,7 @@ import sys
 import data_models as dm
 import parse
 import label
-import word_count as wc
+import sample
 
 if __name__=='__main__':
     if len(sys.argv) == 1:
@@ -26,7 +26,7 @@ if __name__=='__main__':
     dm.create_database()
     dm.create_tables()
     parse.bz2_to_mysql(limit=limit)
-    wc.tabulate_articles(start=0, stop=limit)
+    sample.main()
     label.label_history()
 
 
