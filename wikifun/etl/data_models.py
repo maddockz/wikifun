@@ -98,8 +98,12 @@ def drop_tables():
     :return: None
     """
     db.connect()
-    db.drop_tables([Article, Category, MappingTable, Word, WordFreq])
-    db.close()
+    try:
+        db.drop_tables([Article, Category, MappingTable, Word, WordFreq])
+    except pw.OperationalError, e:
+        print e
+    finally:
+        db.close()
 
 def make_tables_unicode():
     db = msdb.connect(**config.database)
