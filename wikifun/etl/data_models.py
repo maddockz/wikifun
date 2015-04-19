@@ -84,8 +84,12 @@ def create_database():
     cursor = con.cursor()
     sql = "CREATE DATABASE " + config.database['db']
     sql += " CHARSET = utf8 COLLATE = utf8_bin"
-    cursor.execute(sql)
-    con.close()
+    try:
+        cursor.execute(sql)
+    except msdb.ProgrammingError, e:
+        print e
+    finally:
+        con.close()
 
 
 def drop_tables():
